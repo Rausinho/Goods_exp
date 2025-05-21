@@ -17,9 +17,26 @@ namespace Сроковый_товар
         {
             InitializeComponent();
         }
-            private void Form1_Load(object sender, EventArgs e)
+        private void Form1_Load(object sender, EventArgs e)
         {
             FillMonthsAndYears();
+            LoadGoodsFromFile("goods.txt"); // Уточни путь к файлу с товарами
+        }
+
+
+        private Dictionary<string, string> _goods = new Dictionary<string, string>();
+
+        private void LoadGoodsFromFile(string filename)
+        {
+            foreach (var line in File.ReadAllLines(filename))
+            {
+                var parts = line.Split('|');
+
+                if (parts.Length >= 2 && !string.IsNullOrEmpty(parts[0]) && !string.IsNullOrEmpty(parts[1]))
+                {
+                    _goods[parts[0].Trim()] = parts[1].Trim();
+                }
+            }
         }
         private void FillMonthsAndYears()
         {
@@ -40,7 +57,7 @@ namespace Сроковый_товар
             comboBoxYear.SelectedIndex = 0;
         }
 
-            private void buttonSave_Click(object sender, EventArgs e)
+        private void buttonSave_Click(object sender, EventArgs e)
         {
             string code = textBoxCode.Text.Trim();
             string selectedMonth = comboBoxMonth.SelectedItem?.ToString();
@@ -69,7 +86,7 @@ namespace Сроковый_товар
             }
         }
 
-            private void buttonGenerateReport_Click(object sender, EventArgs e)
+        private void buttonGenerateReport_Click(object sender, EventArgs e)
         {
             string selectedMonth = comboBoxMonth.SelectedItem?.ToString();
             string selectedYear = comboBoxYear.SelectedItem?.ToString();
@@ -104,5 +121,28 @@ namespace Сроковый_товар
                 MessageBox.Show("Товаров с указанными параметрами не найдено.", "Информация", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
+
+
+        private void textBoxCode_TextChanged(object sender, EventArgs e)
+        {
+            string enteredCode = textBoxCode.Text.Trim();
+
+            if (!_goods.TryGetValue(enteredCode, out string productName))
+            {
+                // Если товар не найден, выводим сообщение
+                labelProductName.Text = $"Товар с кодом '{enteredCode}' не найден.";
+            }
+            else
+            {
+                // Если товар найден, выводим его название
+                labelProductName.Text = productName;
+            }
+        }
     }
+
     }
+
+
+ 
+    
+    

@@ -42,6 +42,7 @@
             this.textBoxCode.Name = "textBoxCode";
             this.textBoxCode.Size = new System.Drawing.Size(89, 22);
             this.textBoxCode.TabIndex = 0;
+            this.textBoxCode.TextChanged += new System.EventHandler(this.textBoxCode_TextChanged);
             // 
             // comboBoxMonth
             // 
