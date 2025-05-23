@@ -105,22 +105,24 @@ namespace Сроковый_товар
 
             string targetDate = $"{selectedMonth}/{selectedYear}";
 
+            // Собираем список товаров, соответствующих выбранному критерию
             List<string> matchingRecords = new List<string>();
 
             foreach (var line in File.ReadAllLines("expiry_dates.csv"))
             {
                 var parts = line.Split('|');
 
-                if (parts.Length >= 2 && parts[1] == targetDate)
+                if (parts.Length >= 3 && parts[2] == targetDate)
                 {
-                    matchingRecords.Add(line);
+                    matchingRecords.Add($"{parts[0]} — {parts[1]} ({targetDate})");
                 }
             }
 
             if (matchingRecords.Count > 0)
             {
-                // Отобразим результат, например, в отдельном окне
-                MessageBox.Show(string.Join(Environment.NewLine, matchingRecords));
+                // Открываем новую форму и передаём ей список товаров
+                ReportForm reportForm = new ReportForm(matchingRecords);
+                reportForm.ShowDialog();
             }
             else
             {
