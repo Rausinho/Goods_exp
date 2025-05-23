@@ -65,19 +65,25 @@ namespace Сроковый_товар
 
             if (!string.IsNullOrEmpty(code) && !string.IsNullOrEmpty(selectedMonth) && !string.IsNullOrEmpty(selectedYear))
             {
-                // Форматируем строку для записи в файл
-                string record = $"{code}|{selectedMonth}/{selectedYear}";
-
-                try
+                // Получаем название товара по его коду
+                if (_goods.TryGetValue(code, out string productName))
                 {
-                    // Записываем данные в файл
-                    File.AppendAllText("expiry_dates.csv", record + Environment.NewLine, Encoding.UTF8);
+                    // Форматируем строку: <код товара>|<название товара>|<месяц>/<год>
+                    string record = $"{code}|{productName}|{selectedMonth}/{selectedYear}";
 
-                    MessageBox.Show("Данные успешно сохранены!", "Успешно", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    try
+                    {
+                        File.AppendAllText("expiry_dates.csv", record + Environment.NewLine, Encoding.UTF8);
+                        MessageBox.Show("Данные успешно сохранены!", "Успешно", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Ошибка при сохранении данных:\n{ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 }
-                catch (Exception ex)
+                else
                 {
-                    MessageBox.Show($"Ошибка при сохранении данных:\n{ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Товар с указанным кодом не найден.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
             }
             else
