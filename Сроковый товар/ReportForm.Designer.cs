@@ -37,18 +37,17 @@
             this.listBoxResults.ItemHeight = 16;
             this.listBoxResults.Location = new System.Drawing.Point(12, 28);
             this.listBoxResults.Name = "listBoxResults";
-            this.listBoxResults.Size = new System.Drawing.Size(776, 404);
+            this.listBoxResults.Size = new System.Drawing.Size(567, 404);
             this.listBoxResults.TabIndex = 0;
             // 
             // ReportForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(591, 450);
             this.Controls.Add(this.listBoxResults);
             this.Name = "ReportForm";
-            this.Text = "ReportForm";
-//            this.Load += new System.EventHandler(this.ReportForm_Load);
+            this.Text = "Сроковый товар";
             this.ResumeLayout(false);
 
         }

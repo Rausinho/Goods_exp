@@ -17,10 +17,20 @@ namespace Сроковый_товар
         {
             InitializeComponent();
         }
-        private void Form1_Load(object sender, EventArgs e)
+
+        private bool RecordExistsInFile(string code, string date)
         {
-            FillMonthsAndYears();
-            LoadGoodsFromFile("goods.txt"); // Уточни путь к файлу с товарами
+            foreach (var line in File.ReadAllLines("expiry_dates.csv"))
+            {
+                var parts = line.Split('|');
+
+                if (parts.Length >= 3 && parts[0] == code && parts[2] == date)
+                {
+                    return true; // Такая запись уже существует
+                }
+            }
+
+            return false; // Записи с таким кодом и датой нет
         }
 
 
@@ -46,8 +56,8 @@ namespace Сроковый_товар
                 comboBoxMonth.Items.Add(i.ToString());
             }
 
-            // Заполняем годы (например, с текущего года и последующие 10 лет)
-            for (int y = DateTime.Now.Year; y <= DateTime.Now.Year + 10; y++)
+            // Заполняем годы (например, с текущего года и последующие 5 лет)
+            for (int y = DateTime.Now.Year; y <= DateTime.Now.Year + 5; y++)
             {
                 comboBoxYear.Items.Add(y.ToString());
             }
@@ -65,15 +75,35 @@ namespace Сроковый_товар
 
             if (!string.IsNullOrEmpty(code) && !string.IsNullOrEmpty(selectedMonth) && !string.IsNullOrEmpty(selectedYear))
             {
+                string fullDate = $"{selectedMonth}/{selectedYear}";
+
+                // Проверяем, установлена ли галочка "Новый товар"
+                if (checkBoxNewItem.Checked)
+                {
+                    // Удаляем предыдущие записи с таким же кодом товара
+                    RemovePreviousRecords(code);
+                }
+                else
+                {
+                    // Проверяем, существует ли уже такая запись
+                    if (RecordExistsInFile(code, fullDate))
+                    {
+                        MessageBox.Show("Запись с таким кодом и датой уже существует. Она не будет добавлена повторно.", "Информация", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        return; // Завершаем метод, не сохраняя запись
+                    }
+                }
+
                 // Получаем название товара по его коду
                 if (_goods.TryGetValue(code, out string productName))
                 {
                     // Форматируем строку: <код товара>|<название товара>|<месяц>/<год>
-                    string record = $"{code}|{productName}|{selectedMonth}/{selectedYear}";
+                    string record = $"{code}|{productName}|{fullDate}";
 
                     try
                     {
+                        // Записываем данные в файл
                         File.AppendAllText("expiry_dates.csv", record + Environment.NewLine, Encoding.UTF8);
+
                         MessageBox.Show("Данные успешно сохранены!", "Успешно", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                     catch (Exception ex)
@@ -92,6 +122,24 @@ namespace Сроковый_товар
             }
         }
 
+        private void RemovePreviousRecords(string code)
+        {
+            // Читаем файл, удаляем старые записи и переписываем файл
+            List<string> updatedRecords = new List<string>();
+
+            foreach (var line in File.ReadAllLines("expiry_dates.csv"))
+            {
+                var parts = line.Split('|');
+
+                if (parts.Length >= 3 && parts[0] != code)
+                {
+                    updatedRecords.Add(line);
+                }
+            }
+
+            // Переписываем файл с обновлёнными данными
+            File.WriteAllLines("expiry_dates.csv", updatedRecords, Encoding.UTF8);
+        }
         private void buttonGenerateReport_Click(object sender, EventArgs e)
         {
             string selectedMonth = comboBoxMonth.SelectedItem?.ToString();
@@ -121,7 +169,7 @@ namespace Сроковый_товар
             if (matchingRecords.Count > 0)
             {
                 // Открываем новую форму и передаём ей список товаров
-                ReportForm reportForm = new ReportForm(matchingRecords);
+                ReportForm reportForm = new ReportForm(targetDate);
                 reportForm.ShowDialog();
             }
             else
@@ -146,11 +194,40 @@ namespace Сроковый_товар
                 labelProductName.Text = productName;
             }
         }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            FillMonthsAndYears();
+            LoadGoodsFromFile("goods.txt");
+        }
+
+        private void buttonGenerateFutureReport_Click(object sender, EventArgs e)
+        {
+            // Получаем текущий месяц и год
+            int currentMonth = DateTime.Now.Month;
+            int currentYear = DateTime.Now.Year;
+
+            // Вычисляем целевой месяц и год (через три месяца)
+            int targetMonth = currentMonth + 3;
+            int targetYear = currentYear;
+
+            // Если целевые месяц и год превышают пределы текущего года, увеличиваем год
+            if (targetMonth > 12)
+            {
+                targetMonth -= 12;
+                targetYear++;
+            }
+
+            // Формируем строку даты в формате M/YY (без ведущих нулей)
+            string targetDate = $"{targetMonth % 10}/{targetYear}";
+
+            // Открываем новую форму и передаём ей строку с целевой датой
+            ReportForm reportForm = new ReportForm(targetDate);
+            reportForm.ShowDialog();
+        }
     }
+}
 
-    }
 
 
- 
-    
-    
+
