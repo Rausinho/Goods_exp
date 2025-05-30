@@ -1,11 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 
@@ -56,15 +51,17 @@ namespace Сроковый_товар
                 comboBoxMonth.Items.Add(i.ToString());
             }
 
-            // Заполняем годы (например, с текущего года и последующие 5 лет)
-            for (int y = DateTime.Now.Year; y <= DateTime.Now.Year + 5; y++)
+            // Заполняем годы (например, с текущего года и последующие 3 года)
+            for (int y = DateTime.Now.Year; y <= DateTime.Now.Year + 3; y++)
             {
                 comboBoxYear.Items.Add(y.ToString());
             }
 
             // Выбираем текущий месяц и год по умолчанию
-            comboBoxMonth.SelectedIndex = DateTime.Now.Month - 1;
-            comboBoxYear.SelectedIndex = 0;
+            //По хорошему этот кусок кода нужно удалить, чтобы поля были пустыми
+
+            //comboBoxMonth.SelectedIndex = DateTime.Now.Month - 1;
+            //comboBoxYear.SelectedIndex = 0;
         }
 
         private void buttonSave_Click(object sender, EventArgs e)
@@ -88,7 +85,7 @@ namespace Сроковый_товар
                     // Проверяем, существует ли уже такая запись
                     if (RecordExistsInFile(code, fullDate))
                     {
-                        MessageBox.Show("Запись с таким кодом и датой уже существует. Она не будет добавлена повторно.", "Информация", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        MessageBox.Show("Запись уже существует.", "Информация", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         return; // Завершаем метод, не сохраняя запись
                     }
                 }
@@ -225,9 +222,24 @@ namespace Сроковый_товар
             ReportForm reportForm = new ReportForm(targetDate);
             reportForm.ShowDialog();
         }
-    }
-}
 
+        private void оПрограммеToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+            // Информация о программе
+            string appVersion = "v1.0"; // Версия программы
+            string lastUpdate = "30 мая 2025 г."; // Дата последнего обновления
+
+            // Форматируем сообщение
+            string message = $"Версия: {appVersion}\n" +
+                             $"Последнее обновление: {lastUpdate}";
+
+            // Показываем информационное окно
+            MessageBox.Show(message, "О программе", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+    }
+
+}
 
 
 
